@@ -1,4 +1,4 @@
-Import { Suspense } from 'react';
+import { Suspense } from 'react';
 import ProductsClient from './ProductsClient';
 
 export default function ProductsPage() {
