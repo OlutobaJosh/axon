@@ -24,17 +24,19 @@ export default function ProductCard({ product }: { product: Product }) {
       <div className="relative overflow-hidden" style={{ height: '220px', background: 'var(--gray)' }}>
         {product.image_url ? (
           <img
-            src={product.image_url}
-            alt={product.name}
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              objectPosition: 'center',
-              transition: 'transform 0.4s ease',
-            }}
-            className="group-hover:scale-105"
-          />
+  src={product.image_url}
+  alt={product.name}
+  loading="lazy"
+  decoding="async"
+  style={{
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    objectPosition: 'center',
+    transition: 'transform 0.4s ease',
+  }}
+  className="group-hover:scale-105"
+/>
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <span className="text-5xl opacity-30">📦</span>
