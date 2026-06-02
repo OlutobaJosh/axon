@@ -59,14 +59,27 @@ export default function ProductPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
           {/* Image */}
-          <div>
-            <div
-              className="rounded-3xl flex items-center justify-center"
-              style={{ aspectRatio: '1', background: 'var(--gray)', fontSize: '8rem' }}
-            >
-              {ICONS[product.category] ?? '📦'}
-            </div>
-          </div>
+<div>
+  <div className="rounded-3xl overflow-hidden"
+    style={{ aspectRatio: '1', background: 'var(--gray)' }}>
+    {product.image_url ? (
+      <img
+        src={product.image_url}
+        alt={product.name}
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          objectPosition: 'center',
+        }}
+      />
+    ) : (
+      <div className="w-full h-full flex items-center justify-center text-8xl opacity-20">
+        📦
+      </div>
+    )}
+  </div>
+</div>
 
           {/* Info */}
           <div className="lg:sticky" style={{ top: '80px' }}>
