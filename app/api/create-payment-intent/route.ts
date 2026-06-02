@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Save order to Supabase
-    await supabase.from('orders').insert({
+    await supabase.from('axon_orders').insert({
       customer_name: customerName,
       customer_email: customerEmail,
       amount_total: amount / 100,
