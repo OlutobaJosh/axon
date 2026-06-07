@@ -1,20 +1,27 @@
 import type { Config } from 'tailwindcss';
+
 const config: Config = {
   content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
   theme: {
     extend: {
       colors: {
-        apple: {
-          blue:    '#0071e3',
-          bluehov: '#0077ed',
-          gray:    '#f5f5f7',
-          dark:    '#1d1d1f',
-          mid:     '#6e6e73',
-          light:   '#86868b',
+        axon: {
+          bg:      '#fafaf8',
+          fg:      '#1a1714',
+          card:    '#ffffff',
+          primary: '#9c7c52',
+          stone:   '#7a5f3b',
+          sec:     '#f2ede5',
+          muted:   '#f5f1eb',
+          'muted-fg': '#857669',
+          accent:  '#e8dfd0',
+          border:  'rgba(156,124,82,0.15)',
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Outfit', 'system-ui', 'sans-serif'],
+        sans:    ['Inter', 'system-ui', 'sans-serif'],
+        mono:    ['DM Mono', 'monospace'],
       },
     },
   },

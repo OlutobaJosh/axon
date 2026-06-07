@@ -6,7 +6,7 @@ import CartDrawer from '@/components/layout/CartDrawer';
 
 export const metadata: Metadata = {
   title: 'Axon — Premium Tech Accessories',
-  description: 'Clean, minimal tech accessories for the modern workspace.',
+  description: 'Premium gadgets and accessories, engineered for the way you work, create, and live.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

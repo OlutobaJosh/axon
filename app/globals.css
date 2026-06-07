@@ -1,37 +1,59 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ─────────────────────────────────────────────────
+   AXON DESIGN TOKENS  — Warm "Aesop meets tech"
+───────────────────────────────────────────────── */
 :root {
-  --blue:    #0071e3;
-  --blue-h:  #0077ed;
-  --dark:    #1d1d1f;
-  --mid:     #6e6e73;
-  --light:   #86868b;
-  --gray:    #f5f5f7;
-  --gray-2:  #e8e8ed;
+  /* Core palette */
+  --background:  #fafaf8;
+  --foreground:  #1a1714;
+  --card:        #ffffff;
+  --primary:     #9c7c52;
+  --secondary:   #f2ede5;
+  --muted:       #f5f1eb;
+  --muted-fg:    #857669;
+  --accent:      #e8dfd0;
+  --border:      rgba(156, 124, 82, 0.15);
+
+  /* Legacy aliases — keeps existing pages (checkout, products) intact */
+  --dark:    #1a1714;
+  --mid:     #857669;
+  --light:   #a09080;
+  --gray:    #f5f1eb;
+  --gray-2:  #e8dfd0;
   --white:   #ffffff;
-  --border:  #d2d2d7;
+  --blue:    #9c7c52;   /* remapped: blue CTAs now use warm stone */
+  --blue-h:  #7a5f3b;
+
+  /* Typography */
+  --font-display: 'Outfit', system-ui, sans-serif;
+  --font-body:    'Inter', system-ui, sans-serif;
+  --font-mono:    'DM Mono', monospace;
 }
 
+/* ── Reset ── */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 
 body {
-  background: var(--white);
-  color: var(--dark);
-  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
 }
 
+/* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: var(--gray); }
-::-webkit-scrollbar-thumb { background: var(--gray-2); border-radius: 10px; }
+::-webkit-scrollbar-track { background: var(--muted); }
+::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
 
-*:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: 4px; }
-::selection { background: var(--blue); color: white; }
+/* ── Focus / Selection ── */
+*:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 4px; }
+::selection { background: var(--primary); color: white; }
 
 /* ── Buttons ── */
 .btn-primary {
@@ -40,21 +62,21 @@ body {
   justify-content: center;
   gap: 6px;
   padding: 12px 24px;
-  background: var(--blue);
-  color: white;
+  background: var(--foreground);
+  color: var(--background);
   border: none;
-  border-radius: 980px;
+  border-radius: 10px;
   font-size: 0.875rem;
   font-weight: 500;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   cursor: pointer;
-  transition: background 0.2s, transform 0.15s;
+  transition: opacity 0.2s, transform 0.15s;
   text-decoration: none;
   white-space: nowrap;
 }
-.btn-primary:hover { background: var(--blue-h); }
+.btn-primary:hover  { opacity: 0.85; }
 .btn-primary:active { transform: scale(0.98); }
-.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .btn-secondary {
   display: inline-flex;
@@ -62,18 +84,18 @@ body {
   justify-content: center;
   gap: 6px;
   padding: 12px 24px;
-  background: var(--gray);
-  color: var(--dark);
-  border: none;
-  border-radius: 980px;
+  background: var(--muted);
+  color: var(--foreground);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
   font-size: 0.875rem;
   font-weight: 500;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   cursor: pointer;
   transition: background 0.2s;
   text-decoration: none;
 }
-.btn-secondary:hover { background: var(--gray-2); }
+.btn-secondary:hover { background: var(--accent); }
 
 /* ── Field ── */
 .field {
@@ -82,33 +104,34 @@ body {
   border: 1px solid var(--border);
   border-radius: 10px;
   font-size: 0.875rem;
-  font-family: 'Inter', sans-serif;
-  color: var(--dark);
+  font-family: var(--font-body);
+  color: var(--foreground);
   background: white;
   outline: none;
   transition: border-color 0.2s;
 }
-.field:focus { border-color: var(--blue); }
-.field::placeholder { color: var(--light); }
+.field:focus { border-color: var(--primary); }
+.field::placeholder { color: var(--muted-fg); }
 
 /* ── Product card ── */
 .product-card {
-  background: var(--gray);
-  border-radius: 18px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
   overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.25s, box-shadow 0.25s;
   cursor: pointer;
 }
 .product-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.1);
 }
 
 /* ── Cart drawer ── */
 .cart-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.3);
+  background: rgba(26, 23, 20, 0.4);
   z-index: 100;
   backdrop-filter: blur(4px);
 }
@@ -118,22 +141,24 @@ body {
   right: 0;
   height: 100vh;
   width: min(420px, 95vw);
-  background: white;
+  background: var(--background);
   z-index: 101;
   display: flex;
   flex-direction: column;
-  box-shadow: -20px 0 60px rgba(0,0,0,0.15);
+  box-shadow: -20px 0 60px rgba(0, 0, 0, 0.12);
 }
 
 /* ── Category pill ── */
 .pill {
   display: inline-block;
-  padding: 4px 12px;
-  background: var(--gray-2);
-  color: var(--mid);
-  border-radius: 980px;
-  font-size: 0.72rem;
-  font-weight: 500;
+  padding: 3px 10px;
+  background: var(--accent);
+  color: var(--primary);
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 /* ── Animations ── */
@@ -145,14 +170,14 @@ body {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
-.slide-in { animation: slideIn 0.3s cubic-bezier(0.32,0.72,0,1) both; }
+.slide-in { animation: slideIn 0.3s cubic-bezier(0.32, 0.72, 0, 1) both; }
 .fade-in  { animation: fadeIn 0.2s ease both; }
 
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-.slide-up { animation: slideUp 0.5s ease both; }
+.slide-up { animation: slideUp 0.55s ease both; }
 .d1 { animation-delay: 0.1s; }
 .d2 { animation-delay: 0.2s; }
 .d3 { animation-delay: 0.3s; }
