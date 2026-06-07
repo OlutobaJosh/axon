@@ -1,6 +1,6 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
-import { motion, useMotionValue, useSpring, AnimatePresence } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Zap, Shield, Star } from 'lucide-react';
 import Link from 'next/link';
 import type { Product } from '@/lib/supabase';
@@ -8,210 +8,165 @@ import type { Product } from '@/lib/supabase';
 const WORDS = ['Precision.', 'Performance.', 'Power.', 'Perfection.'];
 
 const STATS = [
-  { value: '50K+', label: 'Happy Customers' },
+  { value: '50K+', label: 'Customers' },
   { value: '200+', label: 'Products' },
-  { value: '4.9★', label: 'Avg. Rating' },
-];
-
-const CARD_POSITIONS = [
-  { x: '72%', y: '18%', delay: 0.4 },
-  { x: '76%', y: '58%', delay: 0.65 },
-  { x: '4%',  y: '58%', delay: 0.85 },
+  { value: '4.9★', label: 'Rating' },
 ];
 
 const CATEGORY_ICONS: Record<string, string> = {
-  Audio:       '🎧',
-  Cables:      '🔌',
-  Chargers:    '⚡',
-  Cases:       '💼',
-  Displays:    '🖥️',
-  Accessories: '⌨️',
+  Audio: '🎧', Cables: '🔌', Chargers: '⚡',
+  Cases: '💼', Displays: '🖥️', Accessories: '⌨️',
 };
 
-function FloatingCard({
-  product,
-  position,
-}: {
-  product: Product;
-  position: (typeof CARD_POSITIONS)[0];
-}) {
+/* ── Right-side product showcase ─────────────────────────── */
+
+function ProductShowcase({ products }: { products: Product[] }) {
+  const [main, second, third] = products;
+  if (!main) return null;
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24, scale: 0.92 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ delay: position.delay, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      style={{
-        position: 'absolute',
-        left: position.x,
-        top: position.y,
-        background: 'rgba(255,255,255,0.88)',
-        backdropFilter: 'blur(16px)',
-        border: '1px solid rgba(156,124,82,0.18)',
-        borderRadius: '16px',
-        padding: '14px 18px',
-        minWidth: '170px',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(156,124,82,0.08)',
-        zIndex: 10,
-      }}
+      initial={{ opacity: 0, x: 48 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: 0.45, duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+      style={{ position: 'relative', width: '100%' }}
     >
+      {/* Soft background glow behind the cards */}
+      <div style={{
+        position: 'absolute', inset: '-40px',
+        background: 'radial-gradient(ellipse at 60% 40%, rgba(232,223,208,0.7) 0%, transparent 65%)',
+        pointerEvents: 'none', zIndex: 0,
+      }} />
+
+      {/* Main featured product card */}
       <motion.div
-        animate={{ y: [0, -6, 0] }}
-        transition={{
-          duration: 3.5 + position.delay,
-          repeat: Infinity,
-          ease: 'easeInOut',
+        whileHover={{ y: -4 }}
+        transition={{ type: 'spring', stiffness: 280, damping: 22 }}
+        style={{
+          position: 'relative', zIndex: 1,
+          background: 'var(--card)',
+          border: '1px solid var(--border)',
+          borderRadius: '24px',
+          padding: '24px',
+          marginBottom: '14px',
+          boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-          <span style={{ fontSize: '1.25rem' }}>
-            {CATEGORY_ICONS[product.category] ?? '📦'}
-          </span>
-          <div>
-            <div
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: '0.8rem',
-                fontWeight: 600,
-                color: 'var(--foreground)',
-                lineHeight: 1.2,
-                maxWidth: '110px',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {product.name}
-            </div>
-            <div
-              style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: '0.63rem',
-                color: 'var(--muted-fg)',
-              }}
-            >
-              {product.category}
-            </div>
-          </div>
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginTop: '8px',
-          }}
-        >
-          <span
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: '0.88rem',
-              fontWeight: 700,
-              color: 'var(--primary)',
-            }}
-          >
-            ${product.price.toFixed(2)}
-          </span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-            <Star size={10} fill="#9c7c52" stroke="none" />
-            <span
-              style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: '0.62rem',
-                color: 'var(--muted-fg)',
-                fontWeight: 500,
-              }}
-            >
-              4.9
+        {/* Product image */}
+        <div style={{
+          height: '200px', borderRadius: '14px',
+          background: 'var(--muted)', marginBottom: '18px',
+          overflow: 'hidden', display: 'flex',
+          alignItems: 'center', justifyContent: 'center',
+        }}>
+          {main.image_url ? (
+            <img src={main.image_url} alt={main.name}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          ) : (
+            <span style={{ fontSize: '4.5rem', opacity: 0.45 }}>
+              {CATEGORY_ICONS[main.category] ?? '📦'}
             </span>
+          )}
+        </div>
+
+        {/* Category label */}
+        <span style={{
+          fontFamily: 'var(--font-body)', fontSize: '0.6rem',
+          color: 'var(--primary)', fontWeight: 600,
+          textTransform: 'uppercase', letterSpacing: '0.1em',
+          display: 'block', marginBottom: '4px',
+        }}>
+          {main.category}
+        </span>
+
+        {/* Name + price row */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
+          <div>
+            <div style={{
+              fontFamily: 'var(--font-display)', fontSize: '1rem', fontWeight: 600,
+              color: 'var(--foreground)', letterSpacing: '-0.02em',
+              lineHeight: 1.2, marginBottom: '6px',
+            }}>
+              {main.name}
+            </div>
+            {/* Stars */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+              {[1,2,3,4,5].map(i => (
+                <Star key={i} size={11} fill="#9c7c52" stroke="none" />
+              ))}
+              <span style={{
+                fontFamily: 'var(--font-body)', fontSize: '0.68rem',
+                color: 'var(--muted-fg)', marginLeft: '5px',
+              }}>
+                4.9 · 124 reviews
+              </span>
+            </div>
           </div>
+          <span style={{
+            fontFamily: 'var(--font-display)', fontSize: '1.25rem', fontWeight: 700,
+            color: 'var(--foreground)', letterSpacing: '-0.03em', flexShrink: 0,
+          }}>
+            ${main.price.toFixed(2)}
+          </span>
         </div>
       </motion.div>
+
+      {/* Two secondary mini-cards */}
+      {(second || third) && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', position: 'relative', zIndex: 1 }}>
+          {[second, third].filter(Boolean).map((p) => (
+            <motion.div
+              key={p.id}
+              whileHover={{ y: -3 }}
+              transition={{ type: 'spring', stiffness: 320, damping: 24 }}
+              style={{
+                background: 'var(--card)',
+                border: '1px solid var(--border)',
+                borderRadius: '16px',
+                padding: '14px',
+                display: 'flex', alignItems: 'center', gap: '10px',
+                boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+              }}
+            >
+              <div style={{
+                width: '44px', height: '44px', borderRadius: '10px',
+                background: 'var(--muted)', flexShrink: 0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                overflow: 'hidden',
+              }}>
+                {p.image_url ? (
+                  <img src={p.image_url} alt={p.name}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <span style={{ fontSize: '1.3rem' }}>
+                    {CATEGORY_ICONS[p.category] ?? '📦'}
+                  </span>
+                )}
+              </div>
+              <div style={{ minWidth: 0 }}>
+                <div style={{
+                  fontFamily: 'var(--font-display)', fontSize: '0.75rem', fontWeight: 600,
+                  color: 'var(--foreground)', letterSpacing: '-0.01em',
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                }}>
+                  {p.name}
+                </div>
+                <div style={{
+                  fontFamily: 'var(--font-display)', fontSize: '0.8rem', fontWeight: 700,
+                  color: 'var(--primary)', marginTop: '2px',
+                }}>
+                  ${p.price.toFixed(2)}
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
     </motion.div>
   );
 }
 
-function AnimatedBackground() {
-  return (
-    <div
-      style={{
-        position: 'absolute',
-        inset: 0,
-        overflow: 'hidden',
-        pointerEvents: 'none',
-      }}
-    >
-      {/* Warm radial blobs */}
-      <motion.div
-        animate={{ scale: [1, 1.08, 1], opacity: [0.5, 0.7, 0.5] }}
-        transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-        style={{
-          position: 'absolute',
-          right: '-10%',
-          top: '-15%',
-          width: '65vw',
-          height: '65vw',
-          borderRadius: '50%',
-          background:
-            'radial-gradient(circle, rgba(232,223,208,0.55) 0%, rgba(250,250,248,0) 70%)',
-        }}
-      />
-      <motion.div
-        animate={{ scale: [1, 1.06, 1], opacity: [0.4, 0.6, 0.4] }}
-        transition={{ duration: 11, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
-        style={{
-          position: 'absolute',
-          left: '-15%',
-          bottom: '-10%',
-          width: '55vw',
-          height: '55vw',
-          borderRadius: '50%',
-          background:
-            'radial-gradient(circle, rgba(211,194,172,0.38) 0%, rgba(250,250,248,0) 65%)',
-        }}
-      />
-
-      {/* Subtle grid */}
-      <svg
-        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.035 }}
-      >
-        <defs>
-          <pattern id="axon-grid" width="60" height="60" patternUnits="userSpaceOnUse">
-            <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#9c7c52" strokeWidth="1" />
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#axon-grid)" />
-      </svg>
-
-      {/* Rotating rings */}
-      <motion.div
-        animate={{ rotate: 360 }}
-        transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
-        style={{
-          position: 'absolute',
-          right: '28%',
-          top: '10%',
-          width: '320px',
-          height: '320px',
-          borderRadius: '50%',
-          border: '1px solid rgba(156,124,82,0.1)',
-        }}
-      />
-      <motion.div
-        animate={{ rotate: -360 }}
-        transition={{ duration: 46, repeat: Infinity, ease: 'linear' }}
-        style={{
-          position: 'absolute',
-          right: '26%',
-          top: '8%',
-          width: '420px',
-          height: '420px',
-          borderRadius: '50%',
-          border: '1px solid rgba(156,124,82,0.06)',
-        }}
-      />
-    </div>
-  );
-}
+/* ── Main Hero ───────────────────────────────────────────── */
 
 interface HeroProps {
   featuredProducts: Product[];
@@ -219,130 +174,102 @@ interface HeroProps {
 
 export default function Hero({ featuredProducts }: HeroProps) {
   const [wordIndex, setWordIndex] = useState(0);
-  const mouseX  = useMotionValue(0);
-  const mouseY  = useMotionValue(0);
-  const springX = useSpring(mouseX, { stiffness: 40, damping: 20 });
-  const springY = useSpring(mouseY, { stiffness: 40, damping: 20 });
-  const heroRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const id = setInterval(() => setWordIndex(i => (i + 1) % WORDS.length), 2200);
     return () => clearInterval(id);
   }, []);
 
-  function handleMouseMove(e: React.MouseEvent) {
-    const rect = heroRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    mouseX.set(((e.clientX - cx) / rect.width) * 18);
-    mouseY.set(((e.clientY - cy) / rect.height) * 12);
-  }
-
-  // Use up to 3 featured products for floating cards
-  const floatProducts = featuredProducts.slice(0, 3);
-
   return (
     <section
-      ref={heroRef}
-      onMouseMove={handleMouseMove}
-      className="relative flex items-center overflow-hidden"
       style={{
         minHeight: '100vh',
         background: 'var(--background)',
         paddingTop: '64px',
+        position: 'relative',
+        overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
       }}
     >
-      <AnimatedBackground />
+      {/* Warm radial blobs — CSS only, no JS animation = zero lag */}
+      <div style={{
+        position: 'absolute', top: '-10%', right: '-8%',
+        width: '55vw', height: '55vw', borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(232,223,208,0.55) 0%, transparent 70%)',
+        pointerEvents: 'none',
+      }} />
+      <div style={{
+        position: 'absolute', bottom: '-15%', left: '-12%',
+        width: '45vw', height: '45vw', borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(211,194,172,0.32) 0%, transparent 65%)',
+        pointerEvents: 'none',
+      }} />
 
-      {/* Floating product cards — desktop only, with mouse parallax */}
-      <motion.div
-        className="hidden lg:block"
-        style={{ x: springX, y: springY }}
-      >
-        {floatProducts.map((product, i) => (
-          <FloatingCard
-            key={product.id}
-            product={product}
-            position={CARD_POSITIONS[i]}
-          />
-        ))}
-      </motion.div>
-
-      {/* Main content */}
+      {/* Two-column layout */}
       <div
-        className="relative w-full max-w-7xl mx-auto px-5 lg:px-10 py-24"
-        style={{ zIndex: 10 }}
+        className="w-full max-w-7xl mx-auto px-5 lg:px-10 py-16 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center"
+        style={{ position: 'relative', zIndex: 1 }}
       >
-        <div className="max-w-2xl">
+        {/* ── Left: text content ── */}
+        <div>
+
           {/* Badge */}
           <motion.div
-            initial={{ opacity: 0, y: 14 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-8"
-            style={{ background: 'var(--accent)', border: '1px solid var(--border)' }}
+            transition={{ duration: 0.45 }}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: '7px',
+              padding: '6px 14px', borderRadius: '999px', marginBottom: '28px',
+              background: 'var(--accent)', border: '1px solid var(--border)',
+            }}
           >
-            <Zap size={12} style={{ color: 'var(--primary)' }} />
-            <span
-              style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: '0.72rem',
-                fontWeight: 500,
-                color: 'var(--primary)',
-                letterSpacing: '0.04em',
-              }}
-            >
+            <Zap size={11} style={{ color: 'var(--primary)' }} />
+            <span style={{
+              fontFamily: 'var(--font-body)', fontSize: '0.7rem',
+              fontWeight: 500, color: 'var(--primary)', letterSpacing: '0.04em',
+            }}>
               New arrivals — Summer 2026
             </span>
           </motion.div>
 
           {/* Headline */}
           <motion.h1
-            initial={{ opacity: 0, y: 22 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ delay: 0.08, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(2.8rem, 6.5vw, 5.5rem)',
-              fontWeight: 700,
-              color: 'var(--foreground)',
-              lineHeight: 1.05,
-              letterSpacing: '-0.03em',
+              fontSize: 'clamp(2.6rem, 5.5vw, 5rem)',
+              fontWeight: 700, color: 'var(--foreground)',
+              lineHeight: 1.05, letterSpacing: '-0.03em',
+              marginBottom: '10px',
             }}
           >
-            Built for how
-            <br />
-            you work today.
+            Built for how<br />you work today.
           </motion.h1>
 
           {/* Cycling word */}
           <motion.div
-            initial={{ opacity: 0, y: 14 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.22, duration: 0.55 }}
-            style={{
-              marginTop: '12px',
-              height: '56px',
-              display: 'flex',
-              alignItems: 'center',
-              overflow: 'hidden',
-            }}
+            transition={{ delay: 0.18, duration: 0.5 }}
+            style={{ height: '52px', overflow: 'hidden', marginBottom: '20px' }}
           >
             <AnimatePresence mode="wait">
               <motion.span
                 key={wordIndex}
-                initial={{ y: 40, opacity: 0 }}
+                initial={{ y: 38, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                exit={{ y: -40, opacity: 0 }}
-                transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+                exit={{ y: -38, opacity: 0 }}
+                transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
                 style={{
+                  display: 'block',
                   fontFamily: 'var(--font-display)',
-                  fontSize: 'clamp(2.2rem, 5vw, 4.2rem)',
-                  fontWeight: 700,
-                  color: 'var(--primary)',
-                  letterSpacing: '-0.03em',
-                  lineHeight: 1.1,
+                  fontSize: 'clamp(2rem, 4.5vw, 3.8rem)',
+                  fontWeight: 700, color: 'var(--primary)',
+                  letterSpacing: '-0.03em', lineHeight: 1.1,
                 }}
               >
                 {WORDS[wordIndex]}
@@ -352,52 +279,50 @@ export default function Hero({ featuredProducts }: HeroProps) {
 
           {/* Subtext */}
           <motion.p
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.32, duration: 0.55 }}
-            className="max-w-md mt-6"
+            transition={{ delay: 0.28, duration: 0.5 }}
             style={{
-              fontFamily: 'var(--font-body)',
-              fontSize: '1.05rem',
-              color: 'var(--muted-fg)',
-              lineHeight: 1.7,
-              fontWeight: 400,
+              fontFamily: 'var(--font-body)', fontSize: '1rem',
+              color: 'var(--muted-fg)', lineHeight: 1.7,
+              maxWidth: '420px', marginBottom: '28px',
             }}
           >
-            Premium gadgets and accessories, engineered for those who demand more
-            from every tool in their life.
+            Premium gadgets and accessories, engineered for those who demand
+            more from every tool in their life.
           </motion.p>
 
           {/* CTAs */}
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.44, duration: 0.55 }}
-            className="flex flex-col sm:flex-row gap-3 mt-10"
+            transition={{ delay: 0.36, duration: 0.5 }}
+            style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '32px' }}
           >
             <Link
               href="/products"
-              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl font-medium text-sm transition-opacity"
               style={{
-                background: 'var(--foreground)',
-                color: 'var(--background)',
-                fontFamily: 'var(--font-body)',
-                textDecoration: 'none',
+                display: 'inline-flex', alignItems: 'center', gap: '8px',
+                padding: '12px 26px', borderRadius: '12px',
+                background: 'var(--foreground)', color: 'var(--background)',
+                fontFamily: 'var(--font-body)', fontSize: '0.875rem',
+                fontWeight: 500, textDecoration: 'none',
+                transition: 'opacity 0.18s',
               }}
-              onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
+              onMouseEnter={e => (e.currentTarget.style.opacity = '0.82')}
               onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
             >
-              Shop Now <ArrowRight size={16} />
+              Shop Now <ArrowRight size={15} />
             </Link>
             <Link
               href="#categories"
-              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl font-medium text-sm transition-all"
               style={{
-                border: '1.5px solid var(--border)',
-                color: 'var(--foreground)',
-                fontFamily: 'var(--font-body)',
-                background: 'transparent',
-                textDecoration: 'none',
+                display: 'inline-flex', alignItems: 'center', gap: '8px',
+                padding: '12px 26px', borderRadius: '12px',
+                border: '1.5px solid var(--border)', color: 'var(--foreground)',
+                fontFamily: 'var(--font-body)', fontSize: '0.875rem',
+                fontWeight: 500, textDecoration: 'none', background: 'transparent',
+                transition: 'background 0.18s, border-color 0.18s',
               }}
               onMouseEnter={e => {
                 e.currentTarget.style.background = 'var(--accent)';
@@ -414,116 +339,78 @@ export default function Hero({ featuredProducts }: HeroProps) {
 
           {/* Stats */}
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.58, duration: 0.55 }}
-            className="flex items-center gap-8 mt-14 pt-8"
-            style={{ borderTop: '1px solid var(--border)' }}
+            transition={{ delay: 0.46, duration: 0.5 }}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '28px',
+              paddingTop: '24px', borderTop: '1px solid var(--border)',
+            }}
           >
             {STATS.map((s, i) => (
               <div key={i}>
-                <div
-                  style={{
-                    fontFamily: 'var(--font-display)',
-                    fontSize: '1.4rem',
-                    fontWeight: 700,
-                    color: 'var(--foreground)',
-                    letterSpacing: '-0.02em',
-                  }}
-                >
+                <div style={{
+                  fontFamily: 'var(--font-display)', fontSize: '1.35rem',
+                  fontWeight: 700, color: 'var(--foreground)', letterSpacing: '-0.02em',
+                }}>
                   {s.value}
                 </div>
-                <div
-                  style={{
-                    fontFamily: 'var(--font-body)',
-                    fontSize: '0.72rem',
-                    color: 'var(--muted-fg)',
-                    marginTop: '2px',
-                  }}
-                >
+                <div style={{
+                  fontFamily: 'var(--font-body)', fontSize: '0.7rem',
+                  color: 'var(--muted-fg)', marginTop: '1px',
+                }}>
                   {s.label}
                 </div>
               </div>
             ))}
           </motion.div>
         </div>
-      </div>
 
-      {/* Scroll indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.2 }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-        style={{ color: 'var(--muted-fg)' }}
-      >
-        <motion.div
-          animate={{ y: [0, 6, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-          className="w-5 h-8 rounded-full border-2 flex items-start justify-center pt-1"
-          style={{ borderColor: 'var(--border)' }}
-        >
-          <div
-            className="w-1 h-2 rounded-full"
-            style={{ background: 'var(--primary)' }}
-          />
-        </motion.div>
-      </motion.div>
+        {/* ── Right: product showcase — desktop only ── */}
+        <div className="hidden lg:block">
+          <ProductShowcase products={featuredProducts} />
+        </div>
+      </div>
 
       {/* Trusted-by strip */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.9, duration: 0.6 }}
-        className="absolute bottom-0 left-0 right-0 border-t px-5 lg:px-10 py-3 flex items-center gap-5 overflow-hidden"
+        transition={{ delay: 0.85, duration: 0.5 }}
         style={{
-          borderColor: 'var(--border)',
-          background: 'rgba(250,250,248,0.75)',
+          position: 'absolute', bottom: 0, left: 0, right: 0,
+          borderTop: '1px solid var(--border)',
+          background: 'rgba(250,250,248,0.8)',
           backdropFilter: 'blur(8px)',
+          display: 'flex', alignItems: 'center', gap: '18px',
+          padding: '10px 20px',
         }}
       >
-        <span
-          style={{
-            fontFamily: 'var(--font-body)',
-            fontSize: '0.63rem',
-            color: 'var(--muted-fg)',
-            whiteSpace: 'nowrap',
-            fontWeight: 500,
-            letterSpacing: '0.06em',
-          }}
-        >
-          TRUSTED BY
+        <span style={{
+          fontFamily: 'var(--font-body)', fontSize: '0.6rem',
+          color: 'var(--muted-fg)', fontWeight: 600,
+          letterSpacing: '0.1em', whiteSpace: 'nowrap',
+          textTransform: 'uppercase',
+        }}>
+          Trusted by
         </span>
-        <div className="flex items-center gap-6 overflow-hidden">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '24px', overflow: 'hidden' }}>
           {['TechRadar', 'The Verge', 'WIRED', 'Engadget', '9to5Mac'].map(brand => (
-            <span
-              key={brand}
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: '0.78rem',
-                fontWeight: 600,
-                color: 'var(--foreground)',
-                opacity: 0.35,
-                whiteSpace: 'nowrap',
-              }}
-            >
+            <span key={brand} style={{
+              fontFamily: 'var(--font-display)', fontSize: '0.78rem',
+              fontWeight: 600, color: 'var(--foreground)',
+              opacity: 0.32, whiteSpace: 'nowrap',
+            }}>
               {brand}
             </span>
           ))}
         </div>
-        <div
-          className="flex items-center gap-1.5 ml-auto"
-          style={{ flexShrink: 0 }}
-        >
-          <Shield size={12} style={{ color: 'var(--primary)' }} />
-          <span
-            style={{
-              fontFamily: 'var(--font-body)',
-              fontSize: '0.62rem',
-              color: 'var(--muted-fg)',
-              whiteSpace: 'nowrap',
-            }}
-          >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginLeft: 'auto', flexShrink: 0 }}>
+          <Shield size={11} style={{ color: 'var(--primary)' }} />
+          <span style={{
+            fontFamily: 'var(--font-body)', fontSize: '0.62rem',
+            color: 'var(--muted-fg)', whiteSpace: 'nowrap',
+          }}>
             Secure checkout
           </span>
         </div>
